@@ -12,10 +12,10 @@ using namespace std;
 
 inline void saf_cds_func(saf_scenario_type&       new_scenario,
                          const saf_scenario_type& previous_scenario,
-                         std::tuple<std::vector<double>  , std::vector<double>> inp)
+                         tuple<vector<double>  , vector<double>> inp)
 {
-    auto inp1 = std::get<0>(inp)[0];
-    auto inp2 = std::get<1>(inp)[0];
+    auto inp1 = get<0>(inp)[0];
+    auto inp2 = get<1>(inp)[0];
 
     switch (previous_scenario)
     {
@@ -31,9 +31,9 @@ inline void saf_cds_func(saf_scenario_type&       new_scenario,
     }
 }
 
-inline void saf_kss_func(std::tuple<std::vector<simple_scenario_type>>&    out,
+inline void saf_kss_func(tuple<vector<simple_scenario_type>>&    out,
                          const saf_scenario_type& current_scenario,
-                         std::tuple<std::vector<double>  , std::vector<double>> inp)
+                         tuple<vector<double>  , vector<double>> inp)
 {
     auto& [ks] = out;
     switch (current_scenario)
