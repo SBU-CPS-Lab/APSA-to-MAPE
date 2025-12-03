@@ -153,7 +153,10 @@ SC_MODULE(top)
         SADF::make_kernelMN(
             "J_L",
             J_AL_kernel_func,
-            J_AL_table,
+            {
+                { SelfAware_OPERATE, { {1, 1, 1}, {1, 1, 1} } },
+                { normal_OPERATE,    { {1, 1, 1}, {1, 1, 1} } }
+            },
             tie(s_JAL_to_AL, s_saf_activate, prev_state_JAL),
             J_AL_cntrol,
             tie(s_T2_J_AL, s_AL_to_JAL, Dprev_state_JAL)
@@ -162,7 +165,10 @@ SC_MODULE(top)
         auto bi = SADF::make_kernelMN(
             "BI",
             bi_kernel_func,
-            bi_table,
+            {
+                { SelfAware_OPERATE, { {5}, {1, 1} } },
+                { normal_OPERATE,    { {0}, {0, 0} } }
+            },
             tie(s_BI_2D1, s_BI_2ALAL),
             BI_cntrol,
             tie(s_T2_BI)
@@ -173,7 +179,10 @@ SC_MODULE(top)
         SADF::make_kernelMN(
             "A_L",
             AL_kernel_func,
-            AL_table,
+            {
+                { SelfAware_OPERATE, { {1, 1}, {1, 1} } },
+                { normal_OPERATE,    { {1, 1}, {1, 0} } }
+            },
             tie(s_from_AL, s_AL_to_BO),
             AL_cntrol,
             tie(s_T2_AL, Ds_JAL_to_AL)
@@ -198,7 +207,10 @@ SC_MODULE(top)
         SADF::make_kernelMN(
             "D1",
             d1_kernel_func,
-            d1_table,
+            {
+                { SelfAware_OPERATE, { {1, 1}, {2, 1} } },
+                { normal_OPERATE,    { {0, 0}, {0, 0} } }
+            },
             tie(s_D1_to_EAL, s_D1_to_JALAL),
             D1_cntrol,
             tie(s_BI_2D1, Ds_EAL_to_D1)
@@ -215,7 +227,10 @@ SC_MODULE(top)
         SADF::make_kernelMN(
             "D2",
             d2_kernel_func,
-            d2_table,
+            {
+                { SelfAware_OPERATE, { {1, 1}, {0, 0, 0} } },
+                { normal_OPERATE,    { {0, 0}, {0, 0, 0} } }
+            },
             tie(s_D2_to_BO,  s_D2_to_JALAL , s_D2_to_AALL),
             D2_cntrol,
             tie(Ds_BO_to_D2 , s_AALL_to_D2)
@@ -224,7 +239,10 @@ SC_MODULE(top)
         SADF::make_kernelMN(
             "BO",
             bo_kernel_func,
-            bo_table,
+            {
+                { SelfAware_OPERATE, { {1, 0}, {1} } },
+                { normal_OPERATE,    { {0, 0}, {0} } }
+            },
             tie(s_BO_to_D2),
             BO_cntrol,
             tie(s_AL_to_BO , s_D2_to_BO)
@@ -233,7 +251,10 @@ SC_MODULE(top)
         SADF::make_kernelMN(
             "E_AL",
             E_AL_kernel_func,
-            E_AL_table,
+            {
+                { SelfAware_OPERATE, { {1, 1}, {1, 1} } },
+                { normal_OPERATE,    { {0, 0}, {0, 0} } }
+            },
             tie(s_EAL_to_D1, s_EAL_2AALL),
             E_AL_cntrol,
             tie(s_D1_to_EAL, s_A_ALL2EAL)
@@ -250,7 +271,10 @@ SC_MODULE(top)
         SADF::make_kernelMN(
             "J_ALAL",
             JAL_AL_kernel_func,
-            J_ALAL_table,
+            {
+                { SelfAware_OPERATE, { {1, 1, 1}, {1, 1, 1} } },
+                { normal_OPERATE,    { {0, 0, 0}, {0, 0, 0} } }
+            },
             tie(s_saf_deactive, s_JALAL_report, JALAL_prevState),
             J_ALAL_cntrol,
             tie(s_D1_to_JALAL, s_D2_to_JALAL, DJALAL_prevState)
@@ -275,7 +299,10 @@ SC_MODULE(top)
         SADF::make_kernelMN(
             "A_ALL",
             A_ALL_kernel_func,
-            A_ALL_table,
+            {
+                { SelfAware_OPERATE, { {1, 1, 1}, {1, 1} } },
+                { normal_OPERATE,    { {0, 0, 0}, {0, 0} } }
+            },
             tie(s_A_ALL2EAL , s_AALL_to_D2),
             AL_ALL_cntrol,
             tie(Ds_EAL_2AALL , s_BI_2ALAL , Ds_D2_to_AALL)
@@ -298,7 +325,10 @@ SC_MODULE(top)
             "AL_SAF",
             saf_cds_func,
             saf_kss_func,
-            saf_table,
+            {
+                { normal,    {1} },
+                { selfAware, {1} }
+            },
             selfAware,
             {1,1},
             tie(BI_cntrol),
