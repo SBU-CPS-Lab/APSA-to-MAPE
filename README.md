@@ -26,7 +26,9 @@ This will launch the simulation on port 9000, using your current directory as /a
 ⚙️ Running the APSA Model (ForSyDe/SADF)
 
 After the environment is running, to compile the model must have the systemc and the ForSyDe library. to be able to do that pull the docker image:
+
 Pulling the image : docker pull maryamsam/ubuntu-systemc-forsyde:24.04
+
 Intering te container : docker run -it maryamsam/ubuntu-systemc-forsyde:24.04
 
 Compile the APSA SystemC model:
