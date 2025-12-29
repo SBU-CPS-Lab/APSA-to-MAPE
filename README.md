@@ -25,22 +25,17 @@ This will launch the simulation on port 9000, using your current directory as /a
 
 ⚙️ Running the APSA Model (ForSyDe/SADF)
 
-After the environment is running, compile the APSA SystemC model:
+After the environment is running, to compile the model must have the systemc and the ForSyDe library. to be able to do that pull the docker image:
+Pulling the image : docker pull maryamsam/ubuntu-systemc-forsyde:24.04
+Intering te container : docker run -it maryamsam/ubuntu-systemc-forsyde:24.04
 
-g++ main.cpp -o output -lsystemc  -I #forsyde source files address
-
+Compile the APSA SystemC model:
+g++ -std=c++17 main.cpp -o output -I$FORSYDE_HOME/src  -lsystemc
 
 Notes:
-
 The -lsystemc flag links the SystemC library.
 
-The -I path must point to your local installation of
-ForSyDe-SystemC-DigitalTwin/src/.
-Update this path according to your system.
-
-To run the compiled model:
-
-./output
+To run the compiled model:  ./output
 
 ▶️ Execution Order
 
