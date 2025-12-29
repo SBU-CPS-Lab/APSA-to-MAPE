@@ -29,7 +29,7 @@ After the environment is running, to compile the model must have the systemc and
 
 Pulling the image : docker pull maryamsam/ubuntu-systemc-forsyde:24.04
 
-Intering te container : docker run -it maryamsam/ubuntu-systemc-forsyde:24.04
+Entering te container : docker run -it maryamsam/ubuntu-systemc-forsyde:24.04
 
 Compile the APSA SystemC model:
 g++ -std=c++17 main.cpp -o output -I$FORSYDE_HOME/src  -lsystemc
