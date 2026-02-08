@@ -14,58 +14,6 @@ using namespace sc_core;
 using namespace ForSyDe;
 using namespace std;
 
-// void bi_kernel_func(
-//     tuple<vector<setpoint>, vector<double>>& out,
-//     const simple_scenario_type& sc,
-//     const tuple<vector<double>>& inp)
-// {
-//     const auto& t_room_vec = get<0>(inp);   
-
-//     cout << ">>> [BI] fired\n";
-//     cout << "    t_room tokens: size=" << t_room_vec.size() << "  values=[";
-//     for (size_t i = 0; i < t_room_vec.size(); ++i)
-//         cout << (i? ", ":"") << t_room_vec[i];
-//     cout << "]\n";
-
-//     auto& outTemps = get<0>(out);  // vector< vector<double> >
-//     auto& outAvg   = get<1>(out);  // vector<double>
-
-//     outTemps.clear();
-//     outAvg.clear();
-
-//     if (sc == SelfAware_OPERATE)
-//     {
-//         if (t_room_vec.size() < 5)
-//         {
-//             cout << "    [BI] not enough tokens (need 5). Produced nothing.\n";
-//             return; 
-//         }
-
-//         double sum = 0.0;
-//         for (size_t i = 0; i < 5; ++i) sum += t_room_vec[i];
-//         const double avg  = sum / 5.0;            
-//         const double rate = (t_room_vec[4] - t_room_vec[0]) / 4.0;  
-
-//         outTemps.resize(1);
-//         outTemps[0].resize(2);
-//         outTemps[0][0] = avg;
-//         outTemps[0][1] = rate;
-
-//         outAvg.resize(1);
-//         outAvg[0] = avg;
-
-//         cout << "    [BI] avg=" << avg << "  rate=" << rate << "\n";
-//         cout << "    [BI] out[0]=[avg,rate]=[" << outTemps[0][0] << ", " << outTemps[0][1] << "]\n";
-//         cout << "    [BI] out[1]=[avg]=[" << outAvg[0] << "]\n";
-//     }
-//     else
-//     {
-//         cout << "    [BI] normal_OPERATE -> no outputs (rates = 0)\n";
-//     }
-
-//     cout << ">>> [BI] end\n";
-// }
-
 void bi_kernel_func(
     tuple<vector<setpoint>, vector<double>>& out,
     const simple_scenario_type& sc,
