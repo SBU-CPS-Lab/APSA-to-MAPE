@@ -14,57 +14,142 @@ using namespace sc_core;
 using namespace ForSyDe;
 using namespace std;
 
+// void bi_kernel_func(
+//     tuple<vector<setpoint>, vector<double>>& out,
+//     const simple_scenario_type& sc,
+//     const tuple<vector<double>>& inp)
+// {
+//     const auto& t_room_vec = get<0>(inp);   
+
+//     cout << ">>> [BI] fired\n";
+//     cout << "    t_room tokens: size=" << t_room_vec.size() << "  values=[";
+//     for (size_t i = 0; i < t_room_vec.size(); ++i)
+//         cout << (i? ", ":"") << t_room_vec[i];
+//     cout << "]\n";
+
+//     auto& outTemps = get<0>(out);  // vector< vector<double> >
+//     auto& outAvg   = get<1>(out);  // vector<double>
+
+//     outTemps.clear();
+//     outAvg.clear();
+
+//     if (sc == SelfAware_OPERATE)
+//     {
+//         if (t_room_vec.size() < 5)
+//         {
+//             cout << "    [BI] not enough tokens (need 5). Produced nothing.\n";
+//             return; 
+//         }
+
+//         double sum = 0.0;
+//         for (size_t i = 0; i < 5; ++i) sum += t_room_vec[i];
+//         const double avg  = sum / 5.0;            
+//         const double rate = (t_room_vec[4] - t_room_vec[0]) / 4.0;  
+
+//         outTemps.resize(1);
+//         outTemps[0].resize(2);
+//         outTemps[0][0] = avg;
+//         outTemps[0][1] = rate;
+
+//         outAvg.resize(1);
+//         outAvg[0] = avg;
+
+//         cout << "    [BI] avg=" << avg << "  rate=" << rate << "\n";
+//         cout << "    [BI] out[0]=[avg,rate]=[" << outTemps[0][0] << ", " << outTemps[0][1] << "]\n";
+//         cout << "    [BI] out[1]=[avg]=[" << outAvg[0] << "]\n";
+//     }
+//     else
+//     {
+//         cout << "    [BI] normal_OPERATE -> no outputs (rates = 0)\n";
+//     }
+
+//     cout << ">>> [BI] end\n";
+// }
+
 void bi_kernel_func(
     tuple<vector<setpoint>, vector<double>>& out,
     const simple_scenario_type& sc,
     const tuple<vector<double>>& inp)
 {
-    const auto& t_room_vec = get<0>(inp);   
+    static deque<double> hist;
+    const size_t WINDOW = 5;
 
     cout << ">>> [BI] fired\n";
-    cout << "    t_room tokens: size=" << t_room_vec.size() << "  values=[";
-    for (size_t i = 0; i < t_room_vec.size(); ++i)
-        cout << (i? ", ":"") << t_room_vec[i];
-    cout << "]\n";
+    cout << "    scenario = "
+         << (sc == SelfAware_OPERATE ? "SelfAware_OPERATE" : "normal_OPERATE")
+         << "\n";
 
-    auto& outTemps = get<0>(out);  // vector< vector<double> >
-    auto& outAvg   = get<1>(out);  // vector<double>
+    auto& outTemps = get<0>(out);  // [[avg, rate]]
+    auto& outAvg   = get<1>(out);  // [avg]
 
     outTemps.clear();
     outAvg.clear();
 
-    if (sc == SelfAware_OPERATE)
+    if (sc != SelfAware_OPERATE)
     {
-        if (t_room_vec.size() < 5)
-        {
-            cout << "    [BI] not enough tokens (need 5). Produced nothing.\n";
-            return; 
-        }
-
-        double sum = 0.0;
-        for (size_t i = 0; i < 5; ++i) sum += t_room_vec[i];
-        const double avg  = sum / 5.0;            
-        const double rate = (t_room_vec[4] - t_room_vec[0]) / 4.0;  
-
-        outTemps.resize(1);
-        outTemps[0].resize(2);
-        outTemps[0][0] = avg;
-        outTemps[0][1] = rate;
-
-        outAvg.resize(1);
-        outAvg[0] = avg;
-
-        cout << "    [BI] avg=" << avg << "  rate=" << rate << "\n";
-        cout << "    [BI] out[0]=[avg,rate]=[" << outTemps[0][0] << ", " << outTemps[0][1] << "]\n";
-        cout << "    [BI] out[1]=[avg]=[" << outAvg[0] << "]\n";
+        cout << "    [BI] normal_OPERATE -> no outputs\n";
+        cout << ">>> [BI] end\n";
+        return;
     }
-    else
+
+    const auto& t_room_vec = get<0>(inp);
+
+    if (t_room_vec.empty())
     {
-        cout << "    [BI] normal_OPERATE -> no outputs (rates = 0)\n";
+        cout << "    [BI][WARN] empty input vector -> no outputs\n";
+        cout << ">>> [BI] end\n";
+        return;
     }
+
+    double Tin = t_room_vec[0];
+
+    cout << "    [BI] received Tin = " << Tin << "\n";
+
+    // --- Update sliding window ---
+    hist.push_front(Tin);
+
+    if (hist.size() < WINDOW)
+    {
+        cout << "    [BI] warm-up: padding history with Tin\n";
+        while (hist.size() < WINDOW)
+            hist.push_back(Tin);
+    }
+
+    if (hist.size() > WINDOW)
+        hist.pop_back();
+
+    // --- Print window contents ---
+    cout << "    [BI] window [t, t-1, t-2, t-3, t-4] = [";
+    for (size_t i = 0; i < hist.size(); ++i)
+        cout << (i ? ", " : "") << hist[i];
+    cout << "]\n";
+
+    // --- Compute avg and rate ---
+    double sum = 0.0;
+    for (double v : hist) sum += v;
+
+    double avg  = sum / WINDOW;
+    double rate = (hist[0] - hist[WINDOW - 1]) / (WINDOW - 1);
+
+    cout << "    [BI] avg  = " << avg << "\n";
+    cout << "    [BI] rate = " << rate
+         << "  ( (Tin(t) - Tin(t-4)) / 4 )\n";
+
+    // --- Produce outputs ---
+    outTemps.resize(1);
+    outTemps[0] = { avg, rate };
+
+    outAvg.resize(1);
+    outAvg[0] = avg;
+
+    cout << "    [BI] outputs:\n";
+    cout << "        outTemps[0] = [avg=" << outTemps[0][0]
+         << ", rate=" << outTemps[0][1] << "]\n";
+    cout << "        outAvg[0]   = " << outAvg[0] << "\n";
 
     cout << ">>> [BI] end\n";
 }
+
 
 void bo_kernel_func(
     tuple<vector<setpoint>>& out,
@@ -95,7 +180,7 @@ void bo_kernel_func(
     out_sp[0][0] = al_sp[0][0]; // clg
     out_sp[0][1] = al_sp[0][1]; // htg
 
-    cout << "    [BO] pass-through: sp=[clg=" << out_sp[0][0]
+    cout << "    [BO] pass-through: setpoint=[clg=" << out_sp[0][0]
               << ", htg=" << out_sp[0][1] << "]\n"
               << ">>> [BO] end\n";
 }
@@ -212,11 +297,11 @@ void d1_kernel_func(
 
 void d2_kernel_func(
     tuple<vector<setpoint>,
-               vector<double>,
-               vector<double>>& out,
+    vector<double>,
+    vector<double>>& out,
     const simple_scenario_type& sc,
     const tuple<vector<setpoint>,
-                     vector<setpoint>>& inp)
+    vector<setpoint>>& inp)
 {
     auto& out_sp     = get<0>(out); // [[clg, htg]]
     auto& out_ok_aid = get<1>(out); // [ok_flag] (aux / optional)
@@ -390,11 +475,6 @@ void J_AL_kernel_func(
               << ">>> [J_AL] end\n";
 }
 
-
-#include <iostream>
-#include <tuple>
-#include <vector>
-#include <algorithm>  // clamp
 
 void AL_kernel_func(
     tuple<vector<setpoint>, vector<setpoint>>& out,        // out[0] -> E, out[1] -> BO

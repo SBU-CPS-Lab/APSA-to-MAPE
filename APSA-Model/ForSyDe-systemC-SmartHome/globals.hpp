@@ -62,7 +62,7 @@ J_AL_scenario_table_type J_AL_table =
 
 bi_scenario_table_type bi_table =
 {
-    { SelfAware_OPERATE, make_tuple(sz_array<1>{5}, sz_array<2>{1, 1}) },
+    { SelfAware_OPERATE, make_tuple(sz_array<1>{1}, sz_array<2>{1, 1}) },
     { normal_OPERATE,    make_tuple(sz_array<1>{0}, sz_array<2>{0, 0}) }
 };
 
