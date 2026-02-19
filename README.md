@@ -50,3 +50,6 @@ Compile and run the APSA model
 
 The APSA model expects the environment to be running first, as it reads input values produced by the simulation.
 
+ ForSyDe-systemC-SmartHome model :
+ ![SADF Graph](APSA-Model/ForSyDe-systemC-SmartHome/image.png)
+
