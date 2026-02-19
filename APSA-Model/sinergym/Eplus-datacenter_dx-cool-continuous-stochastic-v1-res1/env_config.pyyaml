@@ -1,0 +1,98 @@
+!EplusEnv
+building_file: 2ZoneDataCenterHVAC_wEconomizer_DX.epJSON
+weather_files: USA_WA_Port.Angeles-William.R.Fairchild.Intl.AP.727885_TMY3.epw
+action_space: !GymSpace
+  class: !Class 'gymnasium.spaces.box.Box'
+  arguments:
+    low: !NumpyArray
+      object:
+      - 14.0
+      - 22.0
+      dtype: numpy:float32
+    high: !NumpyArray
+      object:
+      - 22.0
+      - 30.5
+      dtype: numpy:float32
+    shape: !Tuple
+    - 2
+    dtype: numpy:float32
+time_variables:
+- month
+- day_of_month
+- hour
+variables:
+  outdoor_tempersature: !Tuple
+  - Site Outdoor Air DryBulb Temperature
+  - Environment
+  west_zone_htg_setpoint: !Tuple
+  - Zone Thermostat Heating Setpoint Temperature
+  - West Zone
+  west_zone_clg_setpoint: !Tuple
+  - Zone Thermostat Cooling Setpoint Temperature
+  - West Zone
+  west_zone_air_temperature: !Tuple
+  - Zone Air Temperature
+  - West Zone
+  HVAC_electricity_demand_rate: !Tuple
+  - Facility Total HVAC Electricity Demand Rate
+  - Whole Building
+meters: {}
+actuators:
+  Heating_Setpoint_RL: !Tuple
+  - Schedule:Compact
+  - Schedule Value
+  - Heating Setpoints
+  Cooling_Setpoint_RL: !Tuple
+  - Schedule:Compact
+  - Schedule Value
+  - Cooling Setpoints
+context: {}
+initial_context: null
+weather_variability:
+  Dry Bulb Temperature: !Tuple
+  - 1.0
+  - 0.0
+  - 24.0
+  Relative Humidity: !Tuple
+  - !Tuple
+    - 2.0
+    - 5.0
+  - 0.0
+  - 24.0
+  - !Tuple
+    - 0
+    - 100
+reward: !Class 'sinergym.utils.rewards.LinearReward'
+reward_kwargs:
+  temperature_variables:
+  - west_zone_air_temperature
+  energy_variables:
+  - HVAC_electricity_demand_rate
+  range_comfort_winter:
+  - 18
+  - 27
+  range_comfort_summer:
+  - 18
+  - 27
+  summer_start:
+  - 6
+  - 1
+  summer_final:
+  - 9
+  - 30
+  energy_weight: 0.5
+  lambda_energy: 0.0001
+  lambda_temperature: 1.0
+max_ep_store: 3
+env_name: Eplus-datacenter_dx-cool-continuous-stochastic-v1
+building_config:
+  runperiod: !Tuple
+  - 1
+  - 1
+  - 1991
+  - 7
+  - 1
+  - 1991
+  timesteps_per_hour: 1
+seed: null

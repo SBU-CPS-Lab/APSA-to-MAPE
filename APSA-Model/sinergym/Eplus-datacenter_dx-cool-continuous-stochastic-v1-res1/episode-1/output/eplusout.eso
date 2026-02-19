@@ -1,0 +1,40 @@
+Program Version,EnergyPlus, Version 24.1.0-9d7789a3ac, YMD=2026.02.18 08:10
+1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+3,5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables Requested
+4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested
+5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested
+6,1,Calendar Year of Simulation[] ! When Annual Report Variables Requested
+7,1,Environment,Site Outdoor Air Drybulb Temperature [C] !TimeStep
+673,1,WEST ZONE,Zone Air Temperature [C] !TimeStep
+736,1,WEST ZONE,Zone Thermostat Heating Setpoint Temperature [C] !TimeStep
+737,1,WEST ZONE,Zone Thermostat Cooling Setpoint Temperature [C] !TimeStep
+886,1,Whole Building,Facility Total HVAC Electricity Demand Rate [W] !TimeStep
+End of Data Dictionary
+1,RUNPERIOD 1,  48.12,-123.50,  -8.00,  91.00
+2,1, 1, 1, 0, 1, 0.00,60.00,Tuesday
+7,5.0
+673,23.178027318783165
+736,19.999999999999996
+737,22.999999999999996
+886,3440.5658056623824
+2,1, 1, 1, 0, 2, 0.00,60.00,Tuesday
+7,6.0380391246633875
+673,23.050974294678873
+736,22.0
+737,23.0
+886,4442.119614938456
+2,1, 1, 1, 0, 3, 0.00,60.00,Tuesday
+7,6.481250018691934
+673,25.59735235702792
+736,22.0
+737,26.52120018005371
+886,2619.07111482743
+2,1, 1, 1, 0, 4, 0.00,60.00,Tuesday
+7,6.919759533474862
+673,26.176542002393454
+736,22.0
+737,26.521200180053707
+886,2921.2773720495366
+End of Data
+ Number of Records Written=          20

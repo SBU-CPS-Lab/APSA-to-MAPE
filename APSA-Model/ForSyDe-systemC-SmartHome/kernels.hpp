@@ -630,53 +630,51 @@ void JAL_AL_kernel_func(
     const simple_scenario_type& sc,
     const tuple<vector<double>, vector<double>, vector<double>>& inp)  // inp[0]=det1, inp[1]=det2, inp[2]=prev
 {
-    auto& out_deactivate = get<0>(out);
-    auto& out_report     = get<1>(out);
-    auto& out_status     = get<2>(out);
+    auto& out_deactivate = get<0>(out);  // 1 = deactivate self-aware
+    auto& out_report     = get<1>(out);  // same info for logging
+    auto& out_status     = get<2>(out);  // stored state
 
     out_deactivate.clear();
     out_report.clear();
     out_status.clear();
 
-    cout << ">>> [J_AL_AL] fired. scenario =" << (sc == SelfAware_OPERATE ? "SelfAware" : "normal") << "\n";
+    cout << ">>> [J_AL_AL] fired. scenario="
+         << (sc == SelfAware_OPERATE ? "SelfAware" : "normal") << "\n";
 
-    if (sc != SelfAware_OPERATE) {
-        cout << "    [J_AL_AL] normal -> no outputs (rates=0)\n";
+    if (sc != SelfAware_OPERATE)
+    {
+        cout << "    [J_AL_AL] normal -> no outputs\n";
         return;
     }
 
-    double det1 = 0.0;  // interpret as: D1 mismatch flag (0=OK, 1=mismatch)
-    double det2 = 0.0;  // interpret as: D2 OK flag (1=OK, 0=bad)
-    double prev = 0.0;  // previous OK (1=OK, 0=bad)
+    const auto& d1_vec   = get<0>(inp); // D1 mismatch flag (1=mismatch)
+    const auto& d2_vec   = get<1>(inp); // D2 violation flag (1=violation)
+    const auto& prev_vec = get<2>(inp); // previous deactivate flag
 
-    const auto& v0 = get<0>(inp);
-    const auto& v1 = get<1>(inp);
-    const auto& v2 = get<2>(inp);
+    bool d1_bad   = (!d1_vec.empty()   && d1_vec[0] == 1.0);
+    bool d2_bad   = (!d2_vec.empty()   && d2_vec[0] == 1.0);
+    bool prev_bad = (!prev_vec.empty() && prev_vec[0] == 1.0);
 
-    bool d1_ok   = (v0[0] == 0.0);  // D1 mismatch flag: 0 = OK
-    bool d2_ok   = (v1[0] == 0.0);  // D2 OK flag:       0 = OK
-    bool prev_ok = (v2[0] == 0.0);  // previous OK:      0 = OK
+    cout << "    [J_AL_AL] inputs: "
+         << "D1_mismatch=" << d1_bad
+         << " D2_violation=" << d2_bad
+         << " prev_deactivate=" << prev_bad << "\n";
 
-    cout << "    [J_AL_AL] interpreted: d1_ok=" << d1_ok
-              << " d2_ok=" << d2_ok
-              << " prev_ok=" << prev_ok << "\n";
+    // Deactivate if ANY serious violation persists
+    bool deactivate = d1_bad || d2_bad;
 
-    // Final OK only if ALL are OK
-    double ok_flag = (d1_ok && d2_ok && prev_ok) ? 1.0 : 0.0;
-
-    // --- Produce exactly one token per output ---
     out_deactivate.resize(1);
     out_report.resize(1);
     out_status.resize(1);
 
-    out_deactivate[0] = ok_flag;
-    out_report[0]     = ok_flag;
-    out_status[0]     = ok_flag;
+    out_deactivate[0] = deactivate ? 1.0 : 0.0;
+    out_report[0]     = out_deactivate[0];
+    out_status[0]     = out_deactivate[0];
 
-    cout << "    [J_AL_AL] outputs: deactivate=" << out_deactivate[0]
-              << " report=" << out_report[0]
-              << " status=" << out_status[0] << "\n"
-              << ">>> [J_AL_AL] end\n";
+    cout << "    [J_AL_AL] decision: "
+         << (deactivate ? "DEACTIVATE self-aware mode" : "KEEP self-aware mode")
+         << "\n>>> [J_AL_AL] end\n";
+
 }
 
  
